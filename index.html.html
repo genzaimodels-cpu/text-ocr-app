@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gen Z OCR - Extract Text from Images</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tesseract.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v5/dist/tesseract.min.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 h-full flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/50 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center justify-center">
+                    <i class="fa-solid fa-file-lines text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white">GenZOCR</h1>
+                    <p class="text-xs text-slate-400">Client-Side Optical Character Recognition</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 mr-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Ready & Secure
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Upload & Preview Section -->
+        <section class="lg:col-span-6 flex flex-col space-y-6">
+            <div class="bg-slate-800/60 backdrop-blur border border-slate-700/60 rounded-2xl p-6 shadow-xl">
+                <h2 class="text-base font-semibold text-slate-200 mb-4 flex items-center">
+                    <i class="fa-solid fa-cloud-arrow-up text-indigo-400 mr-2"></i> Upload Image
+                </h2>
+                
+                <!-- Drag and Drop Zone -->
+                <div id="drop-zone" class="border-2 border-dashed border-slate-600 hover:border-indigo-500 transition-all rounded-xl p-8 text-center cursor-pointer bg-slate-900/40 relative group">
+                    <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                    <div class="flex flex-col items-center justify-center space-y-3 pointer-events-none">
+                        <div class="w-16 h-16 bg-slate-800 text-indigo-400 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                            <i class="fa-solid fa-image text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-200">Drag & drop your image here, or <span class="text-indigo-400 underline">browse</span></p>
+                            <p class="text-xs text-slate-400 mt-1">Supports PNG, JPG, WEBP, BMP</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language Selection -->
+                <div class="mt-5">
+                    <label for="lang-select" class="block text-xs font-medium text-slate-400 mb-2">Select OCR Language (100+ Languages Available)</label>
+                    <select id="lang-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                        <option value="eng">English (eng)</option>
+                        <option value="afr">Afrikaans (afr)</option>
+                        <option value="sqi">Albanian (sqi)</option>
+                        <option value="amh">Amharic (amh)</option>
+                        <option value="ara">Arabic (ara)</option>
+                        <option value="hye">Armenian (hye)</option>
+                        <option value="asm">Assamese (asm)</option>
+                        <option value="aze">Azerbaijani (aze)</option>
+                        <option value="eus">Basque (eus)</option>
+                        <option value="bel">Belarusian (bel)</option>
+                        <option value="ben">Bengali (ben)</option>
+                        <option value="bos">Bosnian (bos)</option>
+                        <option value="bul">Bulgarian (bul)</option>
+                        <option value="cat">Catalan (cat)</option>
+                        <option value="ceb">Cebuano (ceb)</option>
+                        <option value="nya">Chichewa (nya)</option>
+                        <option value="chi_sim">Chinese Simplified (chi_sim)</option>
+                        <option value="chi_tra">Chinese Traditional (chi_tra)</option>
+                        <option value="cos">Corsican (cos)</option>
+                        <option value="hrv">Croatian (hrv)</option>
+                        <option value="ces">Czech (ces)</option>
+                        <option value="dan">Danish (dan)</option>
+                        <option value="nld">Dutch (nld)</option>
+                        <option value="epo">Esperanto (epo)</option>
+                        <option value="est">Estonian (est)</option>
+                        <option value="fil">Filipino (fil)</option>
+                        <option value="fin">Finnish (fin)</option>
+                        <option value="fra">French (fra)</option>
+                        <option value="fry">Frisian (fry)</option>
+                        <option value="glg">Galician (glg)</option>
+                        <option value="kat">Georgian (kat)</option>
+                        <option value="deu">German (deu)</option>
+                        <option value="ell">Greek (ell)</option>
+                        <option value="guj">Gujarati (guj)</option>
+                        <option value="hat">Haitian Creole (hat)</option>
+                        <option value="hau">Hausa (hau)</option>
+                        <option value="heb">Hebrew (heb)</option>
+                        <option value="hin">Hindi (hin)</option>
+                        <option value="hmn">Hmong (hmn)</option>
+                        <option value="hun">Hungarian (hun)</option>
+                        <option value="isl">Icelandic (isl)</option>
+                        <option value="ibo">Igbo (ibo)</option>
+                        <option value="ind">Indonesian (ind)</option>
+                        <option value="gle">Irish (gle)</option>
+                        <option value="ita">Italian (ita)</option>
+                        <option value="jpn">Japanese (jpn)</option>
+                        <option value="jav">Javanese (jav)</option>
+                        <option value="kan">Kannada (kan)</option>
+                        <option value="kaz">Kazakh (kaz)</option>
+                        <option value="khm">Khmer (khm)</option>
+                        <option value="kor">Korean (kor)</option>
+                        <option value="kur">Kurdish (kur)</option>
+                        <option value="kir">Kyrgyz (kir)</option>
+                        <option value="lao">Lao (lao)</option>
+                        <option value="lat">Latin (lat)</option>
+                        <option value="lav">Latvian (lav)</option>
+                        <option value="lit">Lithuanian (lit)</option>
+                        <option value="ltz">Luxembourgish (ltz)</option>
+                        <option value="mkd">Macedonian (mkd)</option>
+                        <option value="mlg">Malagasy (mlg)</option>
+                        <option value="msa">Malay (msa)</option>
+                        <option value="mal">Malayalam (mal)</option>
+                        <option value="mlt">Maltese (mlt)</option>
+                        <option value="mri">Maori (mri)</option>
+                        <option value="mar">Marathi (mar)</option>
+                        <option value="mon">Mongolian (mon)</option>
+                        <option value="mya">Myanmar (mya)</option>
+                        <option value="nep">Nepali (nep)</option>
+                        <option value="nor">Norwegian (nor)</option>
+                        <option value="pus">Pashto (pus)</option>
+                        <option value="fas">Persian (fas)</option>
+                        <option value="pol">Polish (pol)</option>
+                        <option value="por">Portuguese (por)</option>
+                        <option value="pan">Punjabi (pan)</option>
+                        <option value="ron">Romanian (ron)</option>
+                        <option value="rus">Russian (rus)</option>
+                        <option value="smo">Samoan (smo)</option>
+                        <option value="gla">Scots Gaelic (gla)</option>
+                        <option value="srp">Serbian (srp)</option>
+                        <option value="sna">Shona (shona)</option>
+                        <option value="snd">Sindhi (snd)</option>
+                        <option value="sin">Sinhala (sin)</option>
+                        <option value="slk">Slovak (slk)</option>
+                        <option value="slv">Slovenian (slv)</option>
+                        <option value="som">Somali (som)</option>
+                        <option value="spa">Spanish (spa)</option>
+                        <option value="sun">Sundanese (sun)</option>
+                        <option value="swa">Swahili (swa)</option>
+                        <option value="swe">Swedish (swe)</option>
+                        <option value="tgk">Tajik (tgk)</option>
+                        <option value="tam">Tamil (tam)</option>
+                        <option value="tat">Tatar (tat)</option>
+                        <option value="tel">Telugu (tel)</option>
+                        <option value="tha">Thai (tha)</option>
+                        <option value="tur">Turkish (tur)</option>
+                        <option value="tuk">Turkmen (tuk)</option>
+                        <option value="ukr">Ukrainian (ukr)</option>
+                        <option value="urd">Urdu (urd)</option>
+                        <option value="uig">Uyghur (uig)</option>
+                        <option value="uzb">Uzbek (uzb)</option>
+                        <option value="vie">Vietnamese (vie)</option>
+                        <option value="cym">Welsh (cym)</option>
+                        <option value="xho">Xhosa (xho)</option>
+                        <option value="yid">Yiddish (yid)</option>
+                        <option value="yor">Yoruba (yor)</option>
+                        <option value="zul">Zulu (zul)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Image Preview Box -->
+            <div id="preview-container" class="bg-slate-800/60 backdrop-blur border border-slate-700/60 rounded-2xl p-6 shadow-xl hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-slate-300 flex items-center">
+                        <i class="fa-solid fa-eye text-indigo-400 mr-2"></i> Image Preview
+                    </h3>
+                    <button id="remove-image" class="text-xs text-rose-400 hover:text-rose-300 transition-colors">
+                        <i class="fa-solid fa-trash mr-1"></i> Remove
+                    </button>
+                </div>
+                <div class="relative w-full h-64 bg-slate-900/80 rounded-xl overflow-hidden flex items-center justify-center border border-slate-700/50">
+                    <img id="image-preview" src="" alt="Uploaded Preview" class="max-h-full max-w-full object-contain rounded-lg">
+                </div>
+                <button id="start-ocr-btn" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Extract Text (OCR)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Right Column: Progress & Output Section -->
+        <section class="lg:col-span-6 flex flex-col space-y-6">
+            
+            <!-- Progress Box -->
+            <div id="progress-card" class="bg-slate-800/60 backdrop-blur border border-slate-700/60 rounded-2xl p-6 shadow-xl hidden">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="progress-status" class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Processing...</span>
+                    <span id="progress-percent" class="text-xs font-bold text-slate-300">0%</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-700/50">
+                    <div id="progress-bar" class="bg-indigo-500 h-2.5 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+            </div>
+
+            <!-- Output Box -->
+            <div class="bg-slate-800/60 backdrop-blur border border-slate-700/60 rounded-2xl p-6 shadow-xl flex flex-col h-[520px]">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-base font-semibold text-slate-200 flex items-center">
+                        <i class="fa-solid fa-file-pen text-indigo-400 mr-2"></i> Extracted Text
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <button id="copy-btn" disabled class="bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center space-x-1.5 shadow">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copy</span>
+                        </button>
+                        <button id="download-btn" disabled class="bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center space-x-1.5 shadow">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Save .txt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Editable Textarea -->
+                <div class="relative flex-grow">
+                    <textarea id="ocr-output" placeholder="Your extracted text will appear here. You can freely edit or translate it..." class="w-full h-full bg-slate-900/80 border border-slate-700/60 rounded-xl p-4 text-slate-200 text-sm focus:outline-none focus:border-indigo-500 resize-none transition-colors font-mono leading-relaxed"></textarea>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800/40 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        <p>Built with Tailwind CSS & Tesseract.js. Supports over 100+ languages locally in your browser.</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeImageBtn = document.getElementById('remove-image');
+        const startOcrBtn = document.getElementById('start-ocr-btn');
+        const progressCard = document.getElementById('progress-card');
+        const progressBar = document.getElementById('progress-bar');
+        const progressStatus = document.getElementById('progress-status');
+        const progressPercent = document.getElementById('progress-percent');
+        const ocrOutput = document.getElementById('ocr-output');
+        const copyBtn = document.getElementById('copy-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const langSelect = document.getElementById('lang-select');
+
+        let currentFile = null;
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        // Highlight drop zone on drag
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('border-indigo-500', 'bg-slate-900/60');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('border-indigo-500', 'bg-slate-900/60');
+            }, false);
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files[0]) {
+                handleFile(files[0]);
+            }
+        });
+
+        // Handle file input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                return;
+            }
+            currentFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                previewContainer.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Remove uploaded image
+        removeImageBtn.addEventListener('click', () => {
+            currentFile = null;
+            imagePreview.src = '';
+            previewContainer.classList.add('hidden');
+            fileInput.value = '';
+            progressCard.classList.add('hidden');
+            ocrOutput.value = '';
+            toggleActionButtons(false);
+        });
+
+        // Start OCR execution
+        startOcrBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+
+            progressCard.classList.remove('hidden');
+            startOcrBtn.disabled = true;
+            startOcrBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            ocrOutput.value = '';
+            toggleActionButtons(false);
+
+            const selectedLang = langSelect.value;
+
+            try {
+                progressStatus.textContent = `Downloading/Initializing language (${selectedLang})...`;
+                progressBar.style.width = '10%';
+                progressPercent.textContent = '10%';
+
+                const result = await Tesseract.recognize(
+                    currentFile,
+                    selectedLang,
+                    {
+                        logger: m => {
+                            if (m && m.status) {
+                                progressStatus.textContent = m.status;
+                                if (m.progress) {
+                                    const percent = Math.round(m.progress * 100);
+                                    progressBar.style.width = percent + '%';
+                                    progressPercent.textContent = percent + '%';
+                                }
+                            }
+                        }
+                    }
+                );
+
+                ocrOutput.value = result.data.text.trim();
+
+                progressStatus.textContent = 'Completed Successfully!';
+                progressBar.style.width = '100%';
+                progressPercent.textContent = '100%';
+                toggleActionButtons(true);
+            } catch (error) {
+                console.error(error);
+                progressStatus.textContent = 'Error during OCR extraction.';
+            } finally {
+                startOcrBtn.disabled = false;
+                startOcrBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        // Copy text to clipboard
+        copyBtn.addEventListener('click', () => {
+            if (!ocrOutput.value) return;
+            ocrOutput.select();
+            document.execCommand('copy');
+            
+            const originalHTML = copyBtn.innerHTML;
+            copyBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> <span>Copied!</span>`;
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+            }, 2000);
+        });
+
+        // Download text file
+        downloadBtn.addEventListener('click', () => {
+            const text = ocrOutput.value;
+            if (!text) return;
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'extracted-text-' + Date.now() + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        function toggleActionButtons(enable) {
+            copyBtn.disabled = !enable;
+            downloadBtn.disabled = !enable;
+        }
+    </script>
+</body>
+</html>
